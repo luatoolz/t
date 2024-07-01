@@ -1,6 +1,5 @@
 describe("assert in_array", function()
-  local t
-	setup(function() t = require "t" end)
+	setup(function() require "t" end)
   it("positive", function()
 		assert.in_array("two", {"one", "two", "three", "four"})
 		assert.in_array(2, {1, 2, 3, 4})
