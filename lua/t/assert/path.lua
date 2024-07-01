@@ -1,0 +1,1 @@
+return {1, "expected to be path: %s", "expected to be not path: %s"}
