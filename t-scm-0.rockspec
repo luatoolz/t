@@ -12,9 +12,9 @@ description = {
 pluggable lib to define types fast
 ]],
   homepage = "https://github.com/luatoolz/t",
-  license = "MIT"
+  license = "MIT",
   issues_url = "https://github.com/luatoolz/t/issues",
-  maintainer = "luatoolz@somahorse.com"
+  maintainer = "luatoolz@somahorse.com",
 }
 
 dependencies = {
