@@ -4,7 +4,7 @@ local noop = t.fn.noop
 local index={}
 local cached = {}
 return setmetatable(cached, {
-  __newindex=function(self, it, v) rawget(self, tonumber(it), v) end,
+  __newindex=function(self, it, v) rawset(self, tonumber(it), v) end,
   __index=function(self, it) return rawget(self, tonumber(it)) end,
   __call=function(self, it)
     if self==cached then
