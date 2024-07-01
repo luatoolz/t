@@ -1,17 +1,15 @@
---stds.t = {
---  globals = {"math", "string", "table"},
---}
-  ignore = {
-    "212/%.%.%.",
-    "131/_",
---    "131/htmlparser_opts",
-    "211/_",
-    "211/t",
-    "212/_",
-    "213/_",
-  }
---std = "min+t"
-std = "min"
+stds.t = {
+  globals = {"math", "string", "table", "toboolean", "tointeger"},
+}
+ignore = {
+  "212/%.%.%.",
+  "131/_",
+  "211/_",
+  "211/t",
+  "212/_",
+  "213/_",
+}
+std = "min+t"
 files["spec"] = {std = "+busted"}
 allow_defined = true
 allow_defined_top = true
