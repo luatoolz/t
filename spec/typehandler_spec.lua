@@ -1,9 +1,9 @@
 describe("typehandler", function()
-  local t, bytyoe
+  local t, typehandler
   setup(function()
     require "compat53"
     t = require "t"
-    typehandler = require "t.typehandler"
+    typehandler = t.typehandler
   end)
   it("type(self)", function()
     local tt = typehandler({
