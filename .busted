@@ -4,8 +4,6 @@ return {
     verbose = true,
     coverage = false,
     recursive = true,
-    ["auto-insulate"] = true,
-    lua = "/usr/bin/luajit",
     lpath = "?.lua;?/init.lua;lua/?.lua;lua/?/init.lua;;",
   }
 }
