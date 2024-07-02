@@ -1,5 +1,5 @@
 stds.t = {
-  globals = {"math", "string", "table", "toboolean", "tointeger"},
+  globals = {"math", "string", "table", "toboolean", "tointeger", "pack", "unpack"},
 }
 ignore = {
   "212/%.%.%.",
