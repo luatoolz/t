@@ -1,16 +1,14 @@
 require 'compat53'
 local t = require "t"
 local is = t.is
-local unpak = unpack or table.unpack
-local pak = pack or table.pack
 return function(...)
-  local func=pak(...)
-  return function(...)
-    local rv=pak(...)
+  local func={...}
+  return function(x)
+    local rv=x
     for i,f in ipairs(func) do
       assert(is.callable(f))
-      rv=pak(f(unpak(rv)))
+      rv=f(rv)
     end
-    return unpak(rv)
+    return rv
   end
 end
