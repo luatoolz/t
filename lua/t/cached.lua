@@ -2,10 +2,12 @@ local t = require "t"
 local noop = t.fn.noop
 
 local index={}
+
+-- cached(id)
 local cached = {}
 return setmetatable(cached, {
-  __newindex=function(self, it, v) rawset(self, tonumber(it), v) end,
-  __index=function(self, it) return rawget(self, tonumber(it)) end,
+  __newindex=function(self, it, v) rawset(self, index[self](it), v) end,
+  __index=function(self, it) return rawget(self, index[self](it)) end,
   __call=function(self, it)
     if self==cached then
       local rv = setmetatable({}, getmetatable(self))
