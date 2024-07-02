@@ -4,17 +4,13 @@ local mt = meta.mt
 local is = t.is
 
 local args, iter = table.args, table.iter
--- table.map, table.filter
 
 return setmetatable({
   of=table.of,
 },{
   __item=t.fn.noop,
-  __mode='kv',
---  __pow=table.of, -- or xor
-  __pairs=function(self)
-    return table.values(self)
-  end,
+  __iter=table.values,
+  __mod=table.filter,
   __call=function(self, ...)
     assert(is.callable(mt(self).__item))
     return setmetatable({}, getmetatable(self)) .. args(...)
@@ -36,13 +32,15 @@ return setmetatable({
     return self
   end,
   __add=function(self, it)
-    assert(is.table.callable(self) and is.table.indexable(self) and it)
+    assert(is.table.callable(self) and is.table.indexable(self))
+    if not it then return self end
     if is.bulk(it) then return self .. it end
     if it and not self[it] then self[it]=it end
     return self
   end,
   __sub=function(self, it)
     assert(is.table.callable(self) and is.table.indexable(self))
+    if is.bulk(it) then for o in iter(it) do _=self-o end; return self end
     it=mt(self).__item(it)
     if it and self[it] then rawset(self, it, nil) end
     return self
@@ -55,7 +53,6 @@ return setmetatable({
       return rv
     end
   end,
-  __mod=table.filter,
   __le=function(a, b)
     assert(is.similar(a, b), 'require similar objects')
     for it in iter(a) do if not b[it] then return false end end
