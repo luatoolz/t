@@ -14,6 +14,9 @@ return setmetatable({
   __mul=table.map,
   __iter=table.ivalues,
   __pairs=ipairs,
+  __tostring=function(self)
+    return table.concat(self, "\n")
+  end,
   __call=function(self, ...)
     assert(is.mtequal(t.array, self, {'__item'}))
     assert(is.callable(mt(self).__item))

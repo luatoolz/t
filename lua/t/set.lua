@@ -11,6 +11,9 @@ return setmetatable({
   __item=t.fn.noop,
   __iter=table.values,
   __mod=table.filter,
+  __tostring=function(self)
+    return table.concat(self, "\n")
+  end,
   __call=function(self, ...)
     assert(is.callable(mt(self).__item))
     return setmetatable({}, getmetatable(self)) .. args(...)
