@@ -7,6 +7,7 @@ if not t then
   require "t.is"
   require "t.assert"
   inspect = require "inspect"
+  meta.no.parse('t')
 end
 
 return t
