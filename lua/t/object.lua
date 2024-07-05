@@ -13,6 +13,7 @@ local tables = table{'__computed', '__computable', '__imports'}:tohash()
 
   return t.object({...})
         :imports({...})
+        :index({...})
         :computed(...)
         :loader({...})
         :instance({})
@@ -37,6 +38,10 @@ return mt({}, {
     local it=mpath
     if it then it=loader(it, topreload, torecursive) end
     if it then cache.loader[self.tt]=it end
+    return self
+  end,
+  index       = function(self, f)
+    if is.callable(f) then self.__indexed=f end
     return self
   end,
   instance    = function(this, t)   -- update instance table & return setmetatabled
