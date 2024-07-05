@@ -13,7 +13,8 @@ local tables = table{'__computed', '__computable', '__imports'}:tohash()
 
   return t.object({...})
         :imports({...})
-        :index({...})
+        :preindex({...})
+        :postindex({...})
         :computed(...)
         :loader({...})
         :factory({})
@@ -40,10 +41,10 @@ return mt({}, {
     if it then cache.loader[self.tt]=it end
     return self
   end,
-  index       = function(self, f)                                       -- set __index function
-    if is.callable(f) then self.__indexed=f end
-    return self
-  end,
+  preindex    = function(self, f)                                       -- set __preindex function
+    if is.callable(f) then self.__preindex=f end; return self; end,
+  postindex       = function(self, f)                                   -- set __postindex function
+    if is.callable(f) then self.__postindex=f end; return self; end,
   factory     = function(this, t)                                       -- return factory
     return mt(this.tt:mtremove(t), this.mm:mtremove({
       __index=no.object,
