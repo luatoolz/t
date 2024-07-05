@@ -16,7 +16,7 @@ local tables = table{'__computed', '__computable', '__imports'}:tohash()
         :index({...})
         :computed(...)
         :loader({...})
-        :instance({})
+        :factory({})
 
   usage (2): assign to mt vars
   local o = t.object()
@@ -26,7 +26,7 @@ local tables = table{'__computed', '__computable', '__imports'}:tohash()
   o.__computable.id=function(...) return ... end
   o.__computable.id = t.db.mongo.oid
 
-  MANDATORY: --> call o:instance()
+  MANDATORY: --> call o:factory()
 --------------------------------------------------------]]
 
 return mt({}, {
@@ -40,11 +40,11 @@ return mt({}, {
     if it then cache.loader[self.tt]=it end
     return self
   end,
-  index       = function(self, f)
+  index       = function(self, f)                                       -- set __index function
     if is.callable(f) then self.__indexed=f end
     return self
   end,
-  instance    = function(this, t)   -- update instance table & return setmetatabled
+  factory     = function(this, t)                                       -- return factory
     return mt(this.tt:mtremove(t), this.mm:mtremove({
       __index=no.object,
       __newindex=function(self, key, value)
