@@ -110,4 +110,35 @@ describe("object", function()
     assert.equal('ANY TEST', rawget(o, 'named'))
     assert.equal('ANY TEST', o.named)
   end)
+  describe("load order", function()
+    it("factory", function()
+      local o = require 'testdata.factory'
+      assert.is_table(o, 'mt is not a function')
+      assert.equal('factory', o.ok)
+    end)
+    it("preindex", function()
+      local o = require 'testdata.preindex'
+      assert.equal('preindex', o.ok)
+    end)
+    it("mt", function()
+      local o = require 'testdata.mt'
+      assert.equal('mt', o.ok())
+    end)
+    it("computable", function()
+      local o = require 'testdata.computable'
+      assert.equal('computable', o.ok)
+    end)
+    it("computed", function()
+      local o = require 'testdata.computed'
+      assert.equal('computed', o.ok)
+    end)
+    it("loader", function()
+      local o = require 'testdata.loader'
+      assert.equal('loader', o.ok)
+    end)
+    it("postindex", function()
+      local o = require 'testdata.postindex'
+      assert.equal('postindex', o.ok)
+    end)
+  end)
 end)
