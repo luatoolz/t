@@ -1,2 +1,2 @@
 local meta = require "meta"
-return meta.is('t')
+return meta.is ^ 't'
