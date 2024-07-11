@@ -38,7 +38,7 @@ return mt({}, {
   loader      = function(self, mpath, topreload, torecursive)           -- define auto loader
     local it=mpath
     if it then it=loader(it, topreload, torecursive) end
-    if it then cache.loader[self.tt]=it end
+    if it then cache.loader[self.tt]=it; end
     return self
   end,
   preindex    = function(self, f)                                       -- set __preindex function
@@ -46,7 +46,7 @@ return mt({}, {
   postindex   = function(self, f)                                       -- set __postindex function
     if is.callable(f) then self.__postindex=f end;    return self end,
   factory     = function(this, t)                                       -- return factory
-    return mt(this.tt:mtremove(t), this.mm:mtremove({
+    local created = mt(this.tt:mtremove(t), this.mm:mtremove({
       __index=no.object,
       __newindex=function(self, key, value)
         local f = (mt(self).__imports or {})[key]
@@ -55,7 +55,12 @@ return mt({}, {
           no.save(self, key, value)
         end
       end,
-    })) end,
+    }))
+    if cache.loader[created] then
+      cache.loader[getmetatable(created)]=cache.loader[created]
+    end
+    return created
+  end,
   __index=function(self, key)
     assert(type(self)=='table')
     assert(type(key)~='nil')
