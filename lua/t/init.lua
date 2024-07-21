@@ -9,6 +9,7 @@ if not t then
   require "t.assert"
   require "t.type"
   inspect = require "inspect"
+  _ = meta.loader('t/init.d', true, true)
 end
 
 return t
