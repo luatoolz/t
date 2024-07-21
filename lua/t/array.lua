@@ -5,11 +5,12 @@ local is = t.is
 
 local args, iter = table.args, table.iter
 
-return setmetatable({
+local array
+array = setmetatable({
   of=table.of,
+  flatten=function(self, o) return is.array(self) and self(o and table.flatten(o) or nil) or array(table.flatten(self)) end,
 },{
-  __name='array',
-  __item=t.fn.noop,
+--  __item=t.fn.noop,
   __mod=table.filter,
   __mul=table.map,
   __iter=table.ivalues,
@@ -19,7 +20,7 @@ return setmetatable({
   end,
   __call=function(self, ...)
     assert(is.mtequal(t.array, self, {'__item'}))
-    assert(is.callable(mt(self).__item))
+    assert(is.callable(mt(self).__item) or mt(self).__item==nil)
     return setmetatable({}, getmetatable(self)) .. args(...)
   end,
   __concat=function(self, o)
@@ -30,7 +31,7 @@ return setmetatable({
   __add=function(self, it)
     assert(is.mtequal(t.array, self, {'__item'}))
     if is.bulk(it) then return self .. it end
-    it=mt(self).__item(it)
+    it=mt(self).__item and mt(self).__item(it) or it
     if it then table.insert(self, it) end
     return self
   end,
@@ -55,3 +56,4 @@ return setmetatable({
     return true
   end,
 })
+return array
