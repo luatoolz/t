@@ -1,0 +1,1 @@
+return {1, "expected to be string/__string-able: %s", "expected to be not string/__string-able: %s"}
