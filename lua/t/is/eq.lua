@@ -1,4 +1,3 @@
-local meta = require "meta"
 return function(a, b)
   if type(a)~='table' and type(b)~='table' then return a==b end
   if type(a)=='table' and type(b)=='table' then
