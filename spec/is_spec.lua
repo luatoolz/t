@@ -94,7 +94,6 @@ describe("t.is", function()
       assert.eq()
       assert.eq(nil)
       assert.eq(nil, nil)
-
       assert.eq('', '')
       assert.eq(3, 3)
       assert.eq(true, table({x=1}))
