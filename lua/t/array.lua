@@ -11,8 +11,8 @@ array = setmetatable({
   flatten=function(self, o) return is.array(self) and self(o and table.flatten(o) or nil) or array(table.flatten(self)) end,
 },{
 --  __item=t.fn.noop,
-  __mod=table.filter,
-  __mul=table.map,
+  __mod=function(self, it) if type(it)=='function' then return self(table.filter(self, it)) end end,
+  __mul=function(self, it) if type(it)=='function' then return self(table.map(self, it)) end; return self end,
   __iter=table.ivalues,
   __pairs=ipairs,
   __tostring=function(self)

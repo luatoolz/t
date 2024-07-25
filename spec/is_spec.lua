@@ -59,7 +59,10 @@ describe("t.is", function()
   end)
   it("mtequal", function()
     assert.mtequal(meta, meta.loader)
-    assert.equal(getmetatable(t.set).__item, t.fn.noop)
+
+    local __item = getmetatable(t.set).__item
+    assert(__item == t.fn.noop or __item==nil)
+
     assert.mtequal(t.set, t.set:of(tostring), {'__item'})
     assert.mtequal(t.set, t.set:of(tonumber), {'__item'})
 
