@@ -1,7 +1,6 @@
 describe("boolean", function()
-  local t
   setup(function()
-    t = require "t"
+    require "t"
   end)
   it("toboolean", function()
     assert.callable(toboolean)
