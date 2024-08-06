@@ -1,9 +1,11 @@
 describe("boolean", function()
-  local bool
-  setup(function() bool = require "t.boolean" end)
+  local t
+  setup(function()
+    t = require "t"
+  end)
   it("toboolean", function()
-    assert.is_function(bool)
-    assert.is_true(bool(7))
-    assert.is_false(bool(0))
+    assert.callable(toboolean)
+    assert.is_true(toboolean(7))
+    assert.is_false(toboolean(0))
   end)
 end)

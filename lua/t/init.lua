@@ -1,14 +1,11 @@
 require "compat53"
 require "luassert"
+local pkg = ...
 local meta = require "meta"
-meta.no.track('t')
 
 if not t then
-  t = meta.loader(select(1, ...), false, true)
-  require "t.is"
-  require "t.assert"
-  require "t.type"
-  _ = meta.loader('t/init.d', true, true)
+  t = meta.loader(pkg, false, true)
+  _ = t['init.d'] .. true
 end
 
-return t
+return t ^ pkg

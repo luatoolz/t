@@ -3,7 +3,7 @@ describe("t.is", function()
   setup(function()
     meta = require "meta"
     t = require "t"
-    is = require "t.is"
+    is = t.is
   end)
   it("tonumber", function()
     assert.equal(0, tonumber(0))
