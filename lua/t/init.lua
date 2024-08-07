@@ -1,16 +1,10 @@
 require "compat53"
 require "luassert"
-local pkg = ...
 local meta = require "meta"
 
 if not t then
-  t = meta.loader(pkg or 't', false, true)
-  assert(t)
-  local i = t['init.d']
-  assert(getmetatable(i) == getmetatable(t))
-  _ = i .. true
---  local i = (t or {})['init.d']
---  if i then _ = i .. true end
+  t = meta.loader('t', false, true)
+  _ = t['init.d'] .. true
 end
 
-return (t or 1) ^ pkg
+return t ^ 't'
