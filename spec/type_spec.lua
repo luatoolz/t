@@ -13,7 +13,13 @@ describe("t.type", function()
     assert.equal('t/array', tt(t.array()))
     assert.equal('t/set', tt(t.set))
     assert.equal('t/set', tt(t.set()))
-    assert.equal('t/is', tt(t.is))
+
+    assert.equal('table', type(meta.is))
+    assert.equal('table', type(t.is))
+
+    assert.equal('meta/is', tt(meta.is))
+    assert.equal('meta/is', tt(t.is))
+
     assert.equal('t', tt(t))
   end)
 end)
