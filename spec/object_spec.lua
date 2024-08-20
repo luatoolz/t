@@ -1,11 +1,10 @@
 describe("object", function()
-  local t, meta, object, cache, inspect
+  local t, meta, object, cache
   setup(function()
     t = require "t"
     meta = require "meta"
     object = t.object
     cache = meta.cache
-    inspect = require 'inspect'
   end)
   it("base", function()
     if next(object) then
