@@ -1,10 +1,11 @@
 describe("object", function()
-  local t, meta, object, cache
+  local t, meta, object, cache, inspect
   setup(function()
     t = require "t"
     meta = require "meta"
     object = t.object
     cache = meta.cache
+    inspect = require 'inspect'
   end)
   it("base", function()
     if next(object) then
@@ -139,6 +140,38 @@ describe("object", function()
     it("postindex", function()
       local o = require 'testdata.postindex'
       assert.equal('postindex', o.ok)
+    end)
+  end)
+  describe("definer", function()
+    it("auth", function()
+      local obj = require 'testdata.def.definer'
+      assert.is_function(obj)
+      local def = require 'testdata.def.auth'
+      assert.is_table(def)
+      local o = obj(def)
+      assert.is_callable(getmetatable(o).__imports.role)
+      assert.is_callable(getmetatable(o).__imports.token)
+      assert.is_table(getmetatable(o).__id)
+      assert.is_table(getmetatable(o).__required)
+
+      o = o({role='suka', token='xx'})
+      assert.is_table(o)
+    end)
+    it("access", function()
+      local obj = require 'testdata.def.definer'
+      assert.is_function(obj)
+      local def = require 'testdata.def.remote'
+      assert.is_table(def)
+      local o = obj(def)
+      assert.is_callable(getmetatable(o).__imports.type)
+      assert.is_callable(getmetatable(o).__imports.id)
+      assert.is_table(getmetatable(o).__id)
+      assert.is_table(getmetatable(o).__required)
+      assert.is_callable(getmetatable(o).ping)
+      assert.is_callable(getmetatable(o).login)
+
+      o = o({id='suka', host='xx'})
+      assert.is_table(o)
     end)
   end)
 end)

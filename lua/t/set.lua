@@ -8,6 +8,7 @@ local args, iter = table.args, table.iter
 return setmetatable({
   of=table.of,
 },{
+  __jsontype='array',
   __add=function(self, it)
     assert(is.of_set(self))
     if not it then return self end
@@ -26,7 +27,7 @@ return setmetatable({
     return self
   end,
   __eq=function(a, b)
-    assert(is.similar(a, b), 'require similar objects')
+    assert(is.similar(a, b), 'require similar objects, but got: ' .. type(b))
     return a <= b and b <= a
   end,
   __index=function(self, it)
@@ -55,7 +56,7 @@ return setmetatable({
     return a <= b and not (b <= a)
   end,
   __mod=function(self, it) if type(it)=='function' then return self(table.filter(self, it)) end end,
---  __mode='v',
+  __mode='v',
   __mul=function(self, it)
     if type(it)=='function' then return self(table.map(self, it)) end
     if type(it)=='table' then
@@ -76,5 +77,6 @@ return setmetatable({
     if it and self[it] then rawset(self, it, nil) end
     return self
   end,
+  __toJSON=function(self) local rv=t.array(self); table.sort(rv); return rv end,
   __tostring=function(self) return table.concat(table.map(table.iter(self), tostring), "\n") end,
 })

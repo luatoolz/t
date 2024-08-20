@@ -1,11 +1,13 @@
 require "compat53"
+local meta = require "meta"
 local no = require "meta.no"
 local loader = require "meta.loader"
 local mt = require "meta.mt"
 local cache = require "meta.cache"
 local is = require "t.is"
+local clone = meta.clone
 
-local tables = table{'__computed', '__computable', '__imports'}:tohash()
+local tables = table{'__computed', '__computable', '__imports', '__required', '__id'}:tohash()
 
 --[[
 ---------------------------------------------------------
@@ -30,22 +32,38 @@ local tables = table{'__computed', '__computable', '__imports'}:tohash()
   MANDATORY: --> call o:factory()
 --------------------------------------------------------]]
 
+local function uniq_split(t)
+  if type(t)=='string' then t=t:split(' ') end
+  if type(t)~='table' then t=nil end
+  return table(t):uniq():null()
+end
+
 return mt({}, {
   mt          = function(self, t) self.mm:update(t);  return self end,  -- static (mt) vars/func/methods
   imports     = function(self, t) self.__imports=t;   return self end,  -- imports spec (typed object vars)
   computed    = function(self, t) self.__computed=t;  return self end,  -- computed vars (saved)
   computable  = function(self, t) self.__computable=t;return self end,  -- computable vars (unsaved)
-  loader      = function(self, mpath, topreload, torecursive)           -- define auto loader
-    local it=mpath
-    if it then it=loader(it, topreload, torecursive) end
-    if it then cache.loader[self.tt]=it; end
+  required    = function(self, t) self.__required =uniq_split(t); return self end,
+  ids         = function(self, t) self.__id       =uniq_split(t); return self end,
+  loader      = function(self, it, topreload, torecursive)
+    if it then cache.loader[self.tt]=loader(it, topreload, torecursive) end; return self end,
+  preindex    = function(self, f) if is.callable(f) then self.__preindex=f end;   return self end,  -- set __preindex function
+  postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
+  define      = function(self, t)
+    t=t or {}
+    local tr = t[true] or {}
+    local tm=table(mt(t))
+    t=table(t)
     return self
+      :computed(tm.__computed)
+      :computable(tm.__computable)
+      :mt(tm % is.callable)
+      :required(tr.required)
+      :ids(tr.id)
+      :imports(t % is.callable)
   end,
-  preindex    = function(self, f)                                       -- set __preindex function
-    if is.callable(f) then self.__preindex=f end;     return self end,
-  postindex   = function(self, f)                                       -- set __postindex function
-    if is.callable(f) then self.__postindex=f end;    return self end,
-  factory     = function(this, t)                                       -- return factory
+  definer = function(self) return function(x) return clone(self):define(x):factory() end end,
+  factory     = function(this, t)
     local created = mt(this.tt:mtremove(t), this.mm:mtremove({
       __index=no.object,
       __newindex=function(self, key, value)
@@ -65,7 +83,6 @@ return mt({}, {
     assert(type(self)=='table')
     assert(type(key)~='nil')
     if type(next(self))=='nil' then return nil end
-
     if tables[key] then
       self.mm[key]=table()
       return self.mm[key]
@@ -76,8 +93,10 @@ return mt({}, {
     assert(type(self)=='table')
     if type(key)=='nil' or type(v)=='nil' then return end
     if type(v)=='table' then
-      v=table(v)
-      if type(self.mm[key])~='table' then self.mm[key]=table(v) else
+--      v=clone(v)
+      if type(self.mm[key])~='table' then
+        self.mm[key]=clone(v)
+      else
         self.mm[key]=table(self.mm[key])
         self.mm[key]:update(v)
       end
