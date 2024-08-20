@@ -1,4 +1,4 @@
-local t = require "t"
+local t = t or require "t"
 local meta = require "meta"
 local mt = meta.mt
 
