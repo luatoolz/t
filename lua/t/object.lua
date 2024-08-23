@@ -49,18 +49,24 @@ return mt({}, {
     if it then cache.loader[self.tt]=loader(it, topreload, torecursive) end; return self end,
   preindex    = function(self, f) if is.callable(f) then self.__preindex=f end;   return self end,  -- set __preindex function
   postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
-  define      = function(self, t)
-    t=t or {}
-    local tr = t[true] or {}
+  define      = function(self, t) if not t then return self end
+    t=t
+    local tr = t[true]
     local tm=table(mt(t))
     t=table(t)
+    if type(tr)=='table' then
+      self:required(tr.required):ids(tr.id)
+    end
+    if tm then
+      self:computed(tm.__computed):computable(tm.__computable)
+      assert(self:mt(tm % is.callable))
+    end
+    if t then
+      local rv={}
+      for k,v in pairs(t) do if (type(k)=='string' and (not k:startswith('__'))) and is.callable(v) then rv[k]=v end end
+      self:imports(rv)
+    end
     return self
-      :computed(tm.__computed)
-      :computable(tm.__computable)
-      :mt(tm % is.callable)
-      :required(tr.required)
-      :ids(tr.id)
-      :imports(t % is.callable)
   end,
   definer = function(self) return function(x) return clone(self):define(x):factory() end end,
   factory     = function(this, t)
