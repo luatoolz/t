@@ -70,7 +70,7 @@ return mt({}, {
   end,
   definer = function(self) return function(x) return clone(self):define(x):factory() end end,
   factory     = function(this, t)
-    local created = mt(this.tt:mtremove(t), this.mm:mtremove({
+    local created = mt(this.tt:mtremove(t, false), this.mm:mtremove({
       __index=no.object,
       __newindex=function(self, key, value)
         local f = (mt(self).__imports or {})[key]
@@ -79,7 +79,7 @@ return mt({}, {
           no.save(self, key, value)
         end
       end,
-    }))
+    }, false))
     if cache.loader[created] then
       cache.loader[getmetatable(created)]=cache.loader[created]
     end
