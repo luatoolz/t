@@ -78,5 +78,12 @@ return setmetatable({
     return self
   end,
   __toJSON=function(self) local rv=t.array(self); table.sort(rv); return rv end,
+--  __toBSON=function(self) local rv=t.array(self); table.sort(rv); return rv end,
+  __toBSON=function(self) local rv={}
+    for v in table.iter(self) do table.insert(rv, v) end
+    table.sort(rv)
+    if #rv>0 then rv.__array=true end
+    return rv
+  end,
   __tostring=function(self) return table.concat(table.map(table.iter(self), tostring), "\n") end,
 })
