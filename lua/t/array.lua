@@ -17,7 +17,7 @@ array = setmetatable({
     if it then table.insert(self, it) end
     return self
   end,
-  __jsontype='array',
+  __array=true,
   __call=function(self, ...)
     assert(is.mtequal(t.array, self, {'__item'}))
     assert(is.callable(mt(self).__item) or mt(self).__item==nil)
@@ -37,7 +37,6 @@ array = setmetatable({
     if type(table.keys(a)())~='nil' or type(table.keys(b)())~='nil' then return false end
     return true
   end,
---  __item=t.fn.noop,
   __iter=table.ivalues,
   __mod=function(self, it) if type(it)=='function' then return self(table.filter(self, it)) end end,
   __mul=function(self, it) if type(it)=='function' then return self(table.map(self, it)) end; return self end,
@@ -51,14 +50,6 @@ array = setmetatable({
     return self
   end,
   __tostring=function(self) return table.concat(self, "\n") end,
-  __toBSON=function(self)
-    local rv={}
-    if #self>0 then
-      rv.__array=true
-      for k,v in pairs(self) do table.insert(rv, v) end
-    end
-    return rv
-  end,
   __unm=function(self) return #self>0 and table.remove(self) or nil end,
 })
 return array

@@ -8,7 +8,7 @@ local args, iter = table.args, table.iter
 return setmetatable({
   of=table.of,
 },{
-  __jsontype='array',
+  __array=true,
   __add=function(self, it)
     assert(is.of_set(self))
     if not it then return self end
@@ -36,7 +36,6 @@ return setmetatable({
     local __item=mt(self).__item
     return rawget(self, is.callable(__item) and __item(it) or it)
   end,
---  __item=t.fn.noop,
   __iter=function(self)
     local k
     return function(...)
@@ -77,13 +76,6 @@ return setmetatable({
     if it and self[it] then rawset(self, it, nil) end
     return self
   end,
-  __toJSON=function(self) local rv=t.array(self); table.sort(rv); return rv end,
---  __toBSON=function(self) local rv=t.array(self); table.sort(rv); return rv end,
-  __toBSON=function(self) local rv={}
-    for v in table.iter(self) do table.insert(rv, v) end
-    table.sort(rv)
-    if #rv>0 then rv.__array=true end
-    return rv
-  end,
+  __export=function(self, fix) local rv=t.array(self); table.sort(rv); return t.exporter(rv, fix) end,
   __tostring=function(self) return table.concat(table.map(table.iter(self), tostring), "\n") end,
 })
