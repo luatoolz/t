@@ -20,7 +20,7 @@ local function exporter(x, fix, skip)
       if fix and type(k)=='number' then array=true end
       rv[k]=exporter(v, fix)
     end
-    array=fix and (array or mt.__array or mt.__arraytype) and true or false
+    array=(fix and type(next(x))~='nil' and (array or mt.__array or mt.__arraytype)) and true or false
     return setup[array](rv)
   end
   error('unknown type' .. type(x))
