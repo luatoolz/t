@@ -7,7 +7,20 @@ local cache = require "meta.cache"
 local is = require "t.is"
 local clone = meta.clone
 
-local tables = table{'__computed', '__computable', '__imports', '__required', '__id'}:tohash()
+local tables = table{'__computed', '__computable', '__imports', '__required', '__id', '__default'}:tohash()
+
+local function update(self, ...)
+  assert(type(self)=='table')
+  for i=1,select('#', ...) do
+    local o = select(i, ...)
+    if type(o)=='table' then
+      for _,v in ipairs(o) do table.append(self, v) end
+      for k,v in pairs(o) do self[k]=v end
+    end
+  end
+  return self
+end
+
 
 --[[
 ---------------------------------------------------------
@@ -35,40 +48,50 @@ local tables = table{'__computed', '__computable', '__imports', '__required', '_
 local function uniq_split(t)
   if type(t)=='string' then t=t:split(' ') end
   if type(t)~='table' then t=nil end
-  return table(t):uniq():null()
+  return setmetatable(table(t):uniq():null(), nil)
 end
 
 return mt({}, {
-  mt          = function(self, t) self.mm:update(t);  return self end,  -- static (mt) vars/func/methods
-  imports     = function(self, t) self.__imports=t;   return self end,  -- imports spec (typed object vars)
-  computed    = function(self, t) self.__computed=t;  return self end,  -- computed vars (saved)
-  computable  = function(self, t) self.__computable=t;return self end,  -- computable vars (unsaved)
-  required    = function(self, t) self.__required =uniq_split(t); return self end,
-  ids         = function(self, t) self.__id       =uniq_split(t); return self end,
+  mt          = function(self, t) if t then update(self.mm, t)   end; return self end,  -- static (mt) vars/func/methods
+  imports     = function(self, t) if t then self.__imports=t    end; return self end,  -- imports spec (typed object vars)
+  computed    = function(self, t) if t then self.__computed=t   end; return self end,  -- computed vars (saved)
+  computable  = function(self, t) if t then self.__computable=t end; return self end,  -- computable vars (unsaved)
+  default     = function(self, t) if t then self.__default=t    end; return self end,
+  required    = function(self, t) if t then self.__required =uniq_split(t) end; return self end,
+  ids         = function(self, t) if t then self.__id       =uniq_split(t) end; return self end,
   loader      = function(self, it, topreload, torecursive)
     if it then cache.loader[self.tt]=loader(it, topreload, torecursive) end; return self end,
   preindex    = function(self, f) if is.callable(f) then self.__preindex=f end;   return self end,  -- set __preindex function
   postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
-  define      = function(self, t) if not t then return self end
-    t=t
-    local tr = t[true]
-    local tm=table(mt(t))
-    t=table(t)
-    if type(tr)=='table' then
-      self:required(tr.required):ids(tr.id)
+  define      = function(self, t, name) if type(t)~='table' then return self end
+    self:required(t[true]):ids(t._):computed(mt(t).__computed):computable(mt(t).__computable)
+    t[false]=nil
+    t[true]=nil
+    t._=nil
+    self:mt(table.filter(mt(t), is.callable))
+    if name then self.__name=name end
+    local rv={}
+    for k,v in pairs(t) do
+      if type(v)=='string' then
+        local matcher=v=='' and string.matcher('.*') or string.matcher(v)
+        rv[k]=function(x) return matcher(tostring(x)) end
+      elseif type(v)=='boolean' then
+        rv[k]=function(x) if type(x)=='nil' then x=v end; return toboolean(x) end
+        self:default({[k]=v})
+      elseif type(v)=='number' then
+        if v==0 then rv[k]=tonumber
+        elseif is.integer(v) then
+          rv[k]=function(x) return (require "t").integer(x) or v end
+          self:default({[k]=v})
+        else
+          rv[k]=tonumber
+          self:default({[k]=v})
+        end
+      elseif is.callable(v) then rv[k]=v end
     end
-    if tm then
-      self:computed(tm.__computed):computable(tm.__computable)
-      assert(self:mt(tm % is.callable))
-    end
-    if t then
-      local rv={}
-      for k,v in pairs(t) do if (type(k)=='string' and (not k:startswith('__'))) and is.callable(v) then rv[k]=v end end
-      self:imports(rv)
-    end
-    return self
+    return self:imports(rv)
   end,
-  definer = function(self) return function(x) return clone(self):define(x):factory() end end,
+  definer = function(self) return function(x, name) return clone(self):define(x, name):factory() end end,
   factory     = function(this, t)
     local created = mt(this.tt:mtremove(t, false), this.mm:mtremove({
       __index=no.object,
@@ -90,7 +113,7 @@ return mt({}, {
     assert(type(key)~='nil')
     if type(next(self))=='nil' then return nil end
     if tables[key] then
-      self.mm[key]=table()
+      self.mm[key]={}
       return self.mm[key]
     end
     return mt(self)[key] or self.mm[key]
@@ -101,10 +124,10 @@ return mt({}, {
     if type(v)=='table' then
 --      v=clone(v)
       if type(self.mm[key])~='table' then
-        self.mm[key]=clone(v)
+        self.mm[key]=setmetatable(clone(v), nil)
       else
-        self.mm[key]=table(self.mm[key])
-        self.mm[key]:update(v)
+--        self.mm[key]=table(self.mm[key])
+        update(self.mm[key], v)
       end
     else
       self.mm[key]=v
