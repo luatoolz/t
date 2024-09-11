@@ -27,6 +27,7 @@ return setmetatable({
     return self
   end,
   __eq=function(a, b)
+    if (not is.of_set(a)) or (not is.of_set(b)) then return nil end
     assert(is.similar(a, b), 'require similar objects, but got: ' .. type(b))
     return a <= b and b <= a
   end,
