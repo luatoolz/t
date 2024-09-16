@@ -21,7 +21,10 @@ array = setmetatable({
   __call=function(self, ...)
     assert(is.mtequal(t.array, self, {'__item'}))
     assert(is.callable(mt(self).__item) or mt(self).__item==nil)
-    return setmetatable({}, getmetatable(self)) .. args(...)
+    if select('#', ...)==0 then return setmetatable({}, getmetatable(self)) end
+    local it=select(1, ...)
+    if type(it)=='table' and #it>0 and (not getmetatable(it)) and is.null(mt(self).__item) then return setmetatable(it, getmetatable(self)) end
+    return self() .. args(...)
   end,
   __concat=function(self, o)
     assert(is.mtequal(t.array, self, {'__item'}))
@@ -38,8 +41,8 @@ array = setmetatable({
     return true
   end,
   __iter=table.ivalues,
-  __mod=function(self, it) if type(it)=='function' then return self(table.filter(self, it)) end end,
-  __mul=function(self, it) if type(it)=='function' then return self(table.map(self, it)) end; return self end,
+  __mod=function(self, it) if is.callable(it) then return array(setmetatable(table.filter(self, it), nil)) end; return self() end,
+  __mul=function(self, it) if is.callable(it) then return array(setmetatable(table.map(self, it), nil)) end; return self end,
   __pairs=ipairs,
   __sub=function(self, it)
     assert(is.mtequal(t.array, self, {'__item'}))
