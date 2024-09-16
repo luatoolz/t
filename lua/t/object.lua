@@ -1,13 +1,12 @@
 require "compat53"
 local meta = require "meta"
-local no = require "meta.no"
-local loader = require "meta.loader"
-local mt = require "meta.mt"
-local cache = require "meta.cache"
-local is = require "t.is"
+local no = meta.no
+local loader = meta.loader
+local mt = meta.mt
+local cache = meta.cache
 local clone = meta.clone
-
-local tables = table{'__computed', '__computable', '__imports', '__required', '__id', '__default'}:tohash()
+local t = t or require "t"
+local is = t.is
 
 local function update(self, ...)
   assert(type(self)=='table')
@@ -45,64 +44,64 @@ end
   MANDATORY: --> call o:factory()
 --------------------------------------------------------]]
 
-local function uniq_split(t)
-  if type(t)=='string' then t=t:split(' ') end
-  if type(t)~='table' then t=nil end
-  return setmetatable(table(t):uniq():null(), nil)
+local function uniq_split(it)
+  if type(it)=='string' then it=it:split(' ') end
+  if type(it)~='table' then it=nil end
+  return setmetatable(table(it):uniq():null(), nil)
 end
 
+local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default'}:tohash()
+
 return mt({}, {
-  mt          = function(self, t) if t then update(self.mm, t)   end; return self end,  -- static (mt) vars/func/methods
-  imports     = function(self, t) if t then self.__imports=t    end; return self end,  -- imports spec (typed object vars)
-  computed    = function(self, t) if t then self.__computed=t   end; return self end,  -- computed vars (saved)
-  computable  = function(self, t) if t then self.__computable=t end; return self end,  -- computable vars (unsaved)
-  default     = function(self, t) if t then self.__default=t    end; return self end,
-  required    = function(self, t) if t then self.__required =uniq_split(t) end; return self end,
-  ids         = function(self, t) if t then self.__id       =uniq_split(t) end; return self end,
+  mt          = function(self, it) if it then update(self.mm, it)   end; return self end,  -- static (mt) vars/func/methods
+  imports     = function(self, it) if it then self.__imports=it    end; return self end,  -- imports spec (typed object vars)
+  computed    = function(self, it) if it then self.__computed=it   end; return self end,  -- computed vars (saved)
+  computable  = function(self, it) if it then self.__computable=it end; return self end,  -- computable vars (unsaved)
+  default     = function(self, it) if it then self.__default=it    end; return self end,
+  required    = function(self, it) if it then self.__required =uniq_split(it) end; return self end,
+  ids         = function(self, it) if it then self.__id       =uniq_split(it) end; return self end,
   loader      = function(self, it, topreload, torecursive)
     if it then cache.loader[self.tt]=loader(it, topreload, torecursive) end; return self end,
   preindex    = function(self, f) if is.callable(f) then self.__preindex=f end;   return self end,  -- set __preindex function
   postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
-  define      = function(self, t, name) if type(t)~='table' then return self end
-    self:required(t[true]):ids(t._):computed(mt(t).__computed):computable(mt(t).__computable)
-    t[false]=nil
-    t[true]=nil
-    t._=nil
-    self:mt(table.filter(mt(t), is.callable))
-    if name then self.__name=name end
+  define      = function(self, it, name, path) if type(it)~='table' then return self end
+    self:required(it[true]):ids(it._):computed(mt(it).__computed):computable(mt(it).__computable)
+    self:mt(table.filter(mt(it), is.callable))
+    if name then self.__def=name end
+    if path then self.__name=path end
     local rv={}
-    for k,v in pairs(t) do
+    for k,v in pairs(it) do if type(k)=='string' then
       if type(v)=='string' then
-        local matcher=v=='' and string.matcher('.*') or string.matcher(v)
-        rv[k]=function(x) return matcher(tostring(x)) end
+        rv[k]=string.matcher(v=='' and '.+' or v)
       elseif type(v)=='boolean' then
-        rv[k]=function(x) if type(x)=='nil' then x=v end; return toboolean(x) end
+        rv[k]=t.boolean
         self:default({[k]=v})
       elseif type(v)=='number' then
         if v==0 then rv[k]=tonumber
         elseif is.integer(v) then
-          rv[k]=function(x) return (require "t").integer(x) or v end
+          rv[k]=t.integer
           self:default({[k]=v})
         else
           rv[k]=tonumber
           self:default({[k]=v})
         end
-      elseif is.callable(v) then rv[k]=v end
+      elseif is.callable(v) then rv[k]=v end end
     end
     return self:imports(rv)
   end,
-  definer = function(self) return function(x, name) return clone(self):define(x, name):factory() end end,
-  factory     = function(this, t)
-    local created = mt(this.tt:mtremove(t, false), this.mm:mtremove({
-      __index=no.object,
-      __newindex=function(self, key, value)
+  definer = function(self) return function(it, name, path) return clone(self):define(it, name, path):factory() end end,
+  factory     = function(this, it)
+    for k,_ in pairs(tables) do this.mm[k]=this.mm[k] or {} end
+    this.mm:mtremove()
+    this.mm.__newindex=this.mm.__newindex or function(self, key, value)
         local f = (mt(self).__imports or {})[key]
         if is.callable(f) then
           no.save(self, key, no.call(f, value)) else
           no.save(self, key, value)
         end
-      end,
-    }, false))
+      end
+    this.mm.__index=this.mm.__index or no.object
+    local created = mt(this.tt:mtremove(it, false), this.mm)
     if cache.loader[created] then
       cache.loader[getmetatable(created)]=cache.loader[created]
     end
@@ -122,11 +121,9 @@ return mt({}, {
     assert(type(self)=='table')
     if type(key)=='nil' or type(v)=='nil' then return end
     if type(v)=='table' then
---      v=clone(v)
       if type(self.mm[key])~='table' then
         self.mm[key]=setmetatable(clone(v), nil)
       else
---        self.mm[key]=table(self.mm[key])
         update(self.mm[key], v)
       end
     else
@@ -134,8 +131,8 @@ return mt({}, {
     end
   end,
   __call = function(self, newmeta)
-    assert(type(self) == 'table', 'await table, got ' .. type(self))
-    assert(type(getmetatable(self)) == 'table', 'await mt(table), got ' .. type(getmetatable(self)))
+    assert(type(self) == 'table', ('await table, got %s'):format(type(self)))
+    assert(type(getmetatable(self)) == 'table', ('await mt(table), got %s'):format(type(getmetatable(self))))
     return setmetatable({tt=table({}), mm=table(newmeta or {})}, getmetatable(self))
   end,
 })
