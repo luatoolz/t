@@ -1,2 +1,2 @@
 local t=t or require "t"
-return t.module.base(...)
+return t.module.base(...).loader

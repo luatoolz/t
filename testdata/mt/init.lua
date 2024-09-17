@@ -1,4 +1,4 @@
-local t = require "t"
+local t = t or require "t"
 return t.object({
   ok=function(self) return 'mt' end,
 }):preindex(
