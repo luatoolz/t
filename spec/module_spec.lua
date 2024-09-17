@@ -15,5 +15,11 @@ describe("module", function()
 
     assert.equal('meta', module(t.module.base('meta')).name)
     assert.equal('meta', module(t.module.base('meta.loader')).name)
+
+    assert.equal('t/def', t.module.base(t.def.auth).name)
+    assert.equal('t/def', t.module.childof(t.def.auth).name)
+
+    assert.equal('t/def/auth', meta.type(t.def.auth))
+    assert.equal('t/def/auth', meta.type(t.def.auth()))
   end)
 end)

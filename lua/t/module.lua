@@ -1,7 +1,19 @@
 local meta = require "meta"
 local t=t or require "t"
-return rawset(meta.module, 'base', function(path)
-  if not t.match.string(path) then return nil end
-  local base = (meta.module(path) or {}).base
-  if base then return meta.loader(base) end
+local cache = meta.cache
+
+-- now return meta.module() of base
+-- use .loader computable to get loader
+rawset(meta.module, 'base', function(it)
+  if type(it)=='table' then it=cache.type[it] end
+  if not t.match.string(it) then return nil end
+  return meta.module((meta.module(it) or {}).base)
 end)
+
+rawset(meta.module, 'childof', function(it)
+  if type(it)=='table' then it=cache.type[it] end
+  if not t.match.string(it) then return nil end
+  return meta.module((meta.module(it) or {}).parent)
+end)
+
+return meta.module
