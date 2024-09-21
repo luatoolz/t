@@ -67,8 +67,8 @@ return mt({}, {
   define      = function(self, it, name, path) if type(it)~='table' then return self end
     self:required(it[true]):ids(it._):computed(mt(it).__computed):computable(mt(it).__computable)
     self:mt(table.filter(mt(it), is.callable))
-    if name then self.__def=name end
-    if path then self.__name=path end
+    if name then self.__def=name else self.__def='unknown' end
+    if path then self.__name=path else self.__name='unknown' end
     local rv={}
     for k,v in pairs(it) do if type(k)=='string' then
       if type(v)=='string' then
@@ -89,7 +89,7 @@ return mt({}, {
     end
     return self:imports(rv)
   end,
-  definer = function(self) return function(it, name, path) return clone(self):define(it, name, path):factory() end end,
+  definer = function(self) return function(it, name, path) return clone(self):define(it or {}, name, path):factory() end end,
   factory     = function(this, it)
     for k,_ in pairs(tables) do this.mm[k]=this.mm[k] or {} end
     this.mm:mtremove()
