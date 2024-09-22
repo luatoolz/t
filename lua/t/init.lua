@@ -3,8 +3,7 @@ require "luassert"
 local meta = require "meta"
 
 if not t then
-  t = meta.loader('t', false, true)
-  _ = t['init.d'] .. true
+  t = meta.loader('t'):init()
 end
 
 return t ^ 't'
