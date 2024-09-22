@@ -1,6 +1,6 @@
 local t=t or require "t"
 local is=t.is
-local getmetatable = debug.getmetatable or getmetatable
+local getmetatable = debug and debug.getmetatable or getmetatable
 local inspect = require "inspect"
 
 local function find_complex(x)
