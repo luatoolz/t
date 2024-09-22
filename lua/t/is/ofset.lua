@@ -3,5 +3,5 @@ return function(x)
   if type(x)~='table' then return false end
   t=t or require "t"
   is=is or t.is
-  return is.mtequal(t.set, x, {'__item'})
+  return is.similar(t.set, x)
 end

@@ -2,57 +2,66 @@ local t = require "t"
 local meta = require "meta"
 local mt = meta.mt
 local is = t.is
-
 local args, iter = table.args, table.iter
 
-local array
-array = setmetatable({
+local array={}
+return setmetatable(array,{
   of=table.of,
   flatten=function(self, o) return array(table.flatten((is.array(self) and o) and o or self)) end,
-},{
   __add=function(self, it)
-    assert(is.mtequal(t.array, self, {'__item'}))
+    assert(is.similar(array, self))
     if is.bulk(it) then return self .. it end
     it=mt(self).__item and mt(self).__item(it) or it
     if it then table.insert(self, it) end
     return self
   end,
   __array=true,
+  __preserve=true,
   __call=function(self, ...)
-    assert(is.mtequal(t.array, self, {'__item'}))
+    assert(is.similar(array, self))
     assert(is.callable(mt(self).__item) or mt(self).__item==nil)
     if select('#', ...)==0 then return setmetatable({}, getmetatable(self)) end
     local it=select(1, ...)
-    if type(it)=='table' and #it>0 and (not getmetatable(it)) and is.null(mt(self).__item) then return setmetatable(it, getmetatable(self)) end
+    if type(it)=='table' and #it>0 then
+      local mts = {
+        [getmetatable(table())]=true,
+        [getmetatable(array)]=true,
+      }
+      local gmt=getmetatable(it)
+      if ((not gmt) or mts[gmt]) and is.null(mt(self).__item) then return setmetatable(it, getmetatable(self)) end
+    end
     return self() .. args(...)
   end,
   __concat=function(self, o)
-    assert(is.mtequal(t.array, self, {'__item'}))
+    assert(is.similar(array, self))
     if is.bulk(o) then for it in iter(o) do _=self+it end end
     return self
   end,
   __eq=function(a, b)
-    assert(is.mtequal(t.array, a, {'__item'}))
-    assert(type(a)=='table' and type(b)=='table')
+    assert(is.similar(array, a))
+    assert(is.similar(a, b))
     if #a~=#b then return false end
     if #a==0 then return (type(next(a))=='nil' and type(next(b))=='nil') and true or false end
     for i=1,#a do if a[i]~=b[i] then return false end end
-    if type(table.keys(a)())~='nil' or type(table.keys(b)())~='nil' then return false end
     return true
   end,
+  __index=function(self, k)
+    assert(is.similar(array, self))
+    if type(k)=='string' then return mt(self)[k] end
+    return rawget(self, k)
+  end,
   __iter=table.ivalues,
-  __mod=function(self, it) if is.callable(it) then return array(setmetatable(table.filter(self, it), nil)) end; return self() end,
-  __mul=function(self, it) if is.callable(it) then return array(setmetatable(table.map(self, it), nil)) end; return self end,
+  __mod=table.filter,
+  __mul=table.map,
   __pairs=ipairs,
   __sub=function(self, it)
-    assert(is.mtequal(t.array, self, {'__item'}))
+    assert(is.similar(array, self))
     if is.bulk(it) then for o in iter(it) do _=self-o end end
     if it and type(it)=='number' then
       if it<1 or it>#self then it=nil end
       table.remove(self, it) end
     return self
   end,
-  __tostring=function(self) return table.concat(self, "\n") end,
-  __unm=function(self) return #self>0 and table.remove(self) or nil end,
+  __tostring=function(self) assert(is.similar(array, self)); return table.concat(self*tostring, "\n") end,
+  __unm=function(self) assert(is.similar(array, self)); return #self>0 and table.remove(self) or nil end,
 })
-return array
