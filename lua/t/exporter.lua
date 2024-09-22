@@ -32,7 +32,7 @@ local function exporter(x, fix, skip)
           local v=x[i]
           table.insert(rv, is.complex(v) and exporter(v, fix) or v)
         end
-        array=true
+        array=fix and true or false
         return setup[array](rv)
       end
       if type(next(x))~='nil' then
