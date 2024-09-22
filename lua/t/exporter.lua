@@ -1,7 +1,6 @@
 local t=t or require "t"
 local is=t.is
 local getmetatable = debug and debug.getmetatable or getmetatable
-local inspect = require "inspect"
 
 local function find_complex(x)
   if not is.complex(x) then return false end
@@ -60,6 +59,6 @@ local function exporter(x, fix, skip)
       if mt.__tostring then return tostring(x) end
     end
   end
-  error(('unknown type: %s, mt: %s'):format(type(x), inspect(getmetatable(x))))
+  error(('unknown type: %s'):format(type(x)))
 end
 return exporter

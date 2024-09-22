@@ -1,6 +1,5 @@
 require "compat53"
 require "luassert"
-inspect = require "inspect"
 local meta = require "meta"
 
 if not t then
