@@ -1,2 +1,2 @@
-local t = require "t"
+local t = t or require "t"
 return toboolean

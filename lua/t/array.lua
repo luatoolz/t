@@ -1,4 +1,4 @@
-local t = require "t"
+local t = t or require "t"
 local meta = require "meta"
 local mt = meta.mt
 local is = t.is
@@ -32,9 +32,9 @@ return setmetatable(array,{
     end
     return self() .. args(...)
   end,
-  __concat=function(self, o)
+  __concat=function(self, it)
     assert(is.similar(array, self))
-    if is.bulk(o) then for it in iter(o) do _=self+it end end
+    if is.bulk(it) then for x in iter(it) do _=self+x end end
     return self
   end,
   __eq=function(a, b)
@@ -56,7 +56,7 @@ return setmetatable(array,{
   __pairs=ipairs,
   __sub=function(self, it)
     assert(is.similar(array, self))
-    if is.bulk(it) then for o in iter(it) do _=self-o end end
+    if is.bulk(it) then for x in iter(it) do _=self-x end end
     if it and type(it)=='number' then
       if it<1 or it>#self then it=nil end
       table.remove(self, it) end
