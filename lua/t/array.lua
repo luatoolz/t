@@ -62,6 +62,7 @@ return setmetatable(array,{
       table.remove(self, it) end
     return self
   end,
+  __tonumber=function(self) return #self end,
   __tostring=function(self) assert(is.similar(array, self)); return table.concat(self*tostring, "\n") end,
   __unm=function(self) assert(is.similar(array, self)); return #self>0 and table.remove(self) or nil end,
 })
