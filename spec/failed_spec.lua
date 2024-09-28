@@ -1,7 +1,8 @@
 describe("failed", function()
-  local t, e
+  local t, is, e
   setup(function()
     t = require "t"
+    is = t.is
     e = t.failed
   end)
   it("ok", function()
@@ -20,5 +21,7 @@ describe("failed", function()
 
     assert.equal(false, toboolean(e(nil, 'e')))
     assert.equal(false, toboolean(e(nil, 'e', 'some')))
+
+    assert.truthy(is.failed(e(nil, 'e')))
   end)
 end)

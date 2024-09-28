@@ -1,21 +1,17 @@
-local t = t or require "t"
-local report
+local t=t or require "t"
+local is=t.is
+local meta=require "meta"
+local log=meta.log
+local indexed=table.iindexed
 return setmetatable({}, {
-  __error='t/failed',
-  __call=function(self, ok, e, ...)
-    if type(ok)=='nil' and e then
-      local rv={tostring(e)}
-      for _,v in ipairs({...}) do
-        v=v and tostring(v) or nil
-        if v then table.insert(rv, v) end
-      end
-      setmetatable(rv, getmetatable(self))
-      if report then print(rv) end
-      return rv
-    end
-    return ok, e, ...
-  end,
-  __pow=function(self, it) report=it; return self end,
+  __add=function(self, it) if it and it~=true then table.insert(self, tostring(it)) end; return self end,
+  __call=function(self, ok, ...) local e = ...
+    if type(ok)~='nil' or e==true or type(e)=='nil' then return ok, ... end
+    return (setmetatable({}, getmetatable(self)) .. {...})*log end,
+  __concat=function(self, it) if indexed(it) then
+    for i=1,#it do local _ = self+it[i] end end; return self end,
+  __mul=function(self, it) if is.callable(it) then it(self) end; return self end,
+  __pow=function(self, it) return log ^ it end,
   __toboolean=function(self) return false end,
   __tostring=function(self) return table.concat(self, ' ') end,
 })
