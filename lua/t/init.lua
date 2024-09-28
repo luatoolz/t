@@ -6,6 +6,7 @@ if not t then
   t = meta.loader('t') ^ 't'
   t:assert(meta.no.asserted)
   t:init()
+  t:patch()
 end
 
 return t
