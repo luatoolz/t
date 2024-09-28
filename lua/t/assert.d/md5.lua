@@ -1,0 +1,1 @@
+return {1, "expected to match md5: %s", "expected to not match md5: %s"}

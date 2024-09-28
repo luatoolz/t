@@ -1,2 +1,2 @@
 local t=t or require "t"
-return t.matcher.x32
+return t.match.md5
