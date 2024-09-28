@@ -25,8 +25,8 @@ local function exporter(x, fix, skip)
   local mt = getmetatable(x or {}) or {}
   local to = mt.__export
   if complex[tofix](x) then
-    if is.callable(to) and not skip then x=to(x)
-      return (skip or (not find_complex(x))) and x or exporter(x, fix, skip)
+    if is.callable(to) and not skip then x=to(x, fix)
+      return ((not fix) and (skip or (not find_complex(x)))) and x or exporter(x, fix, skip)
     end
     local rv={}
     local array
