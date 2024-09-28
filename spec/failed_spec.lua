@@ -4,6 +4,7 @@ describe("failed", function()
     t = require "t"
     is = t.is
     e = t.failed
+    local _ = t.failed ^ false
   end)
   it("ok", function()
     assert.is_table(e)
