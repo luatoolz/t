@@ -10,6 +10,9 @@ describe("match", function()
     assert.equal('x/pic.same/module', t.strip.luafiles('x/pic.same/module.lua'))
 
     assert.equal('module', t.match.basename('x/pic.same/module'))
+
+    assert.equal('t/storage/mongo', t.match.modbase('t/storage/mongo/connection'))
+    assert.equal('t.storage.mongo', t.match.modbase('t.storage.mongo.connection'))
   end)
   it("md5", function()
     local hash = 'bf99f3a50b0f254517402d909c8d0358'
