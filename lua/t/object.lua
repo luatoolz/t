@@ -50,7 +50,7 @@ local function uniq_split(it)
   return setmetatable(table(it):uniq():null(), nil)
 end
 
-local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default'}:tohash()
+local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default', '__filter', '__action'}:tohash()
 
 return mt({}, {
   mt          = function(self, it) if it then update(self.mm, it)   end; return self end,  -- static (mt) vars/func/methods
@@ -58,6 +58,8 @@ return mt({}, {
   computed    = function(self, it) if it then self.__computed=it   end; return self end,  -- computed vars (saved)
   computable  = function(self, it) if it then self.__computable=it end; return self end,  -- computable vars (unsaved)
   default     = function(self, it) if it then self.__default=it    end; return self end,
+  filter      = function(self, it) if it then self.__filter=it     end; return self end,
+  action      = function(self, it) if it then self.__action=it     end; return self end,
   required    = function(self, it) if it then self.__required =uniq_split(it) end; return self end,
   ids         = function(self, it) if it then self.__id       =uniq_split(it) end; return self end,
   loader      = function(self, it, topreload, torecursive)
@@ -66,6 +68,17 @@ return mt({}, {
   postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
   define      = function(self, it, name, path) if type(it)~='table' then return self end
     self:required(it[true]):ids(it._):computed(mt(it).__computed):computable(mt(it).__computable)
+      :filter(mt(it).__filter)
+    if mt(it).__action then
+      if type(mt(it).__action)=='function' then
+        local __action={__=mt(it).__action}
+        mt(it).__action=nil
+        self:action(__action)
+      end
+      if type(mt(it).__action)=='table' then
+        self:action(mt(it).__action)
+      end
+    end
     self:mt(table.filter(mt(it), is.callable))
     if name then self.__def=name else self.__def='unknown' end
     if path then self.__name=path else self.__name='unknown' end
