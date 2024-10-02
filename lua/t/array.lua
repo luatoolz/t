@@ -22,6 +22,8 @@ return setmetatable(array,{
     assert(is.callable(mt(self).__item) or mt(self).__item==nil)
     if select('#', ...)==0 then return setmetatable({}, getmetatable(self)) end
     local it=select(1, ...)
+    if type(it)=='userdata' then it=t.exporter(it) end
+    if type(it)=='table' and (not getmetatable(it)) and type(next(it))=='nil' then return setmetatable(it, getmetatable(self)) end
     if type(it)=='table' and #it>0 then
       local mts = {
         [getmetatable(table())]=true,
