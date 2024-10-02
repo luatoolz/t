@@ -7,7 +7,7 @@ if not t then
   t = meta.loader('t') ^ 't'
   t:assert(no.asserted)
   t:init()
-  t:patch(no.call)
+  t:patch()
 end
 
 return t
