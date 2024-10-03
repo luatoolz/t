@@ -1,2 +1,2 @@
 local t=t or require "t"
-return function(x) return (t.pkg(x) or {}).name end
+return function(x) return tostring(t.pkg(x)) end
