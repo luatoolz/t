@@ -1,6 +1,5 @@
 local t=t or require "t"
 local is=t.is
-local getmetatable = debug and debug.getmetatable or getmetatable
 
 local function find_complex(x)
   if type(x)~='table' then return false end
