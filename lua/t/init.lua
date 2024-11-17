@@ -1,13 +1,11 @@
-require "compat53"
-require "luassert"
 local meta = require "meta"
-local no=meta.no
 
 if not t then
   t = meta.loader('t') ^ 't'
-  t:assert(no.asserted)
+  if package.loaded.luassert then
+    t:assert(meta * 'assert')
+  end
   t:init()
-  t:patch()
 end
 
 return t

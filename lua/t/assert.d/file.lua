@@ -1,1 +1,0 @@
-return {1, "expected to be file object: %s", "expected to be not file object: %s"}

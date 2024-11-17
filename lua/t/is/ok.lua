@@ -1,2 +1,3 @@
-require "meta"
-return function(x) return toboolean(x) end
+local t=t or require "t"
+local to=t.to
+return function(x) return to.boolean(x) end

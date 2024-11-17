@@ -1,1 +1,0 @@
-return function(x) return type(x)=='string' or (type(x)=='table' and type(getmetatable(x or {}).__tostring)=='function') end

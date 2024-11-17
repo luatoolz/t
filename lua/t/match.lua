@@ -1,3 +1,2 @@
-local pkg=(...) or 't/match'
-local meta=require "meta"
-return meta.wrapper('t/matcher', pkg) ^ string.matcher
+local t=t or require "t"
+return t.wrapper(t.matcher, string.matcher)

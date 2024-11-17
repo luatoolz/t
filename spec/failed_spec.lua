@@ -1,10 +1,11 @@
 describe("failed", function()
-  local t, is, e
+  local t, is, to, e
   setup(function()
     t = require "t"
-    is = t.is
-    e = t.failed
-    local _ = t.failed ^ false
+    is, to, e = t.is, t.to, t.failed ^ false
+  end)
+  it("meta", function()
+    assert.callable(e)
   end)
   it("ok", function()
     assert.is_table(e)
@@ -20,8 +21,8 @@ describe("failed", function()
     assert.equal('e', tostring(e(nil, 'e')))
     assert.equal('e some', tostring(e(nil, 'e', 'some')))
 
-    assert.equal(false, toboolean(e(nil, 'e')))
-    assert.equal(false, toboolean(e(nil, 'e', 'some')))
+    assert.equal(false, to.boolean(e(nil, 'e')))
+    assert.equal(false, to.boolean(e(nil, 'e', 'some')))
 
     assert.truthy(is.failed(e(nil, 'e')))
   end)

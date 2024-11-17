@@ -1,2 +1,2 @@
 local t = t or require "t"
-return toboolean
+return t.to.boolean

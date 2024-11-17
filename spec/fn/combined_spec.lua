@@ -1,4 +1,4 @@
-describe("t.fn.combined", function()
+describe("fn.combined", function()
   local t, combined
   setup(function()
     t = require "t"

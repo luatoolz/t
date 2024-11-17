@@ -1,0 +1,1 @@
+return (t or require("t")).is.has

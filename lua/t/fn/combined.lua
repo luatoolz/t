@@ -1,15 +1,17 @@
-require 'compat53'
-local t = t or require "t"
-local is = t.is
-local unpak = unpack or table.unpack
-local pak = pack or table.pack
+local meta = require "meta"
+local is, pak, unpak =
+  meta.is,
+  pack or table.pack,
+  unpack or table.unpack
+
 return function(...)
   local func={...}
   return function(...)
     local rv=pak(...)
     for i,f in ipairs(func) do
-      assert(is.callable(f))
-      rv=pak(f(unpak(rv)))
+      if is.callable(f) then
+        rv=pak(f(unpak(rv)))
+      end
     end
     return unpak(rv)
   end

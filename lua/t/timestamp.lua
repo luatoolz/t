@@ -1,3 +1,3 @@
 local t = t or require "t"
-local date = t.date
-return function(x) return tonumber(date(x)) end
+local to, date = t.to, t.date
+return function(x) return to.number(date(x)) end

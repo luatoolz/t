@@ -1,9 +1,6 @@
 local t = t or require "t"
 local meta = require "meta"
-local mt = meta.mt
-local is = t.is
-local export = t.exporter
-local args, iter = table.args, table.iter
+local is, mt, array, export, iter, noop = t.is, meta.mt.mt, t.array, t.exporter, table.iter, meta.fn.noop
 
 return setmetatable({},{
   of=table.of,
@@ -19,7 +16,9 @@ return setmetatable({},{
   __call=function(self, ...)
     assert(is.ofset(self))
     assert(is.callable(mt(self).__item) or mt(self).__item==nil)
-    return setmetatable({}, getmetatable(self)) .. args(...)
+    local args={...}
+    if #args==1 and type(args[1])=='table' then args=args[1] end
+    return setmetatable({}, getmetatable(self)) .. args
   end,
   __concat=function(self, o)
     assert(is.ofset(self))
@@ -34,7 +33,7 @@ return setmetatable({},{
   __index=function(self, it)
     if type(it)=='nil' then return nil end
     assert(is.ofset(self))
-    local item=mt(self).__item or t.fn.noop
+    local item=mt(self).__item or noop
     local rv
     if type(it)=='string' then rv=mt(self)[it] end
     return rv or rawget(self, it) or rawget(self, item(it))
@@ -60,6 +59,7 @@ return setmetatable({},{
   __mod=table.filter,
   __mode='v',
   __mul=table.map,
+  __name='set',
   __newindex=function(self, it, v)
     assert(is.ofset(self))
     if it and is.callable(mt(self).__item) then it=mt(self).__item(it) end
@@ -72,6 +72,6 @@ return setmetatable({},{
     if it and self[it] then rawset(self, it, nil) end
     return self
   end,
-  __export=function(self, fix) local rv=t.array(self); table.sort(rv); return export(rv, fix) end,
-  __tostring=function(self) return table.concat(t.array(self)*tostring, "\n") end,
+  __export=function(self, fix) local rv=array(self); table.sort(rv); return export(rv, fix) end,
+  __tostring=function(self) return table.concat(array(self)*tostring, "\n") end,
 })

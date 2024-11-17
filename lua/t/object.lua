@@ -1,12 +1,15 @@
-require "compat53"
+local t = t or require "t"
+local is = t.is
 local meta = require "meta"
-local no = meta.no
 local loader = meta.loader
 local mt = meta.mt
 local cache = meta.cache
-local clone = meta.clone
-local t = t or require "t"
-local is = t.is
+local clone = table.clone
+local pcall = meta.pcall
+local _object = mt.object
+local to = t.to
+
+cache.conf.defroot={}
 
 local function update(self, ...)
   assert(type(self)=='table')
@@ -47,10 +50,11 @@ end
 local function uniq_split(it)
   if type(it)=='string' then it=it:split(' ') end
   if type(it)~='table' then it=nil end
-  return setmetatable(table(it):uniq():null(), nil)
+  local rv=table(it):uniq()
+  if type(next(rv))~='nil' then return setmetatable(rv, nil) end
 end
 
-local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default', '__filter', '__action'}:tohash()
+local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default', '__filter', '__action'}:hashed()
 
 return mt({}, {
   mt          = function(self, it) if it then update(self.mm, it)   end; return self end,  -- static (mt) vars/func/methods
@@ -80,8 +84,12 @@ return mt({}, {
       end
     end
     self:mt(table.filter(mt(it), is.callable))
+    if name and path and #path>#name then
+      self.__name='%s %s'%{path:sub(1,#path-#name-1),name}
+    else
+      if path then self.__name=path else self.__name='unknown' end
+    end
     if name then self.__def=name else self.__def='unknown' end
-    if path then self.__name=path else self.__name='unknown' end
     local rv={}
     for k,v in pairs(it) do if type(k)=='string' then
       if type(v)=='string' then
@@ -90,31 +98,35 @@ return mt({}, {
         rv[k]=t.boolean
         self:default({[k]=v})
       elseif type(v)=='number' then
-        if v==0 then rv[k]=tonumber
+        if v==0 then rv[k]=to.number
         elseif is.integer(v) then
-          rv[k]=t.integer
+          rv[k]=t.number.integer
           self:default({[k]=v})
         else
-          rv[k]=tonumber
+          rv[k]=to.number
           self:default({[k]=v})
         end
       elseif is.callable(v) then rv[k]=v end end
     end
     return self:imports(rv)
   end,
-  definer = function(self) return function(it, name, path) return clone(self):define(it or {}, name, path):factory() end end,
+  definer = function(self) return function(it, name, path)
+    local rv=clone(self):define(it or {}, name, path):factory()
+    cache.defroot[rv]=mt(rv).__name
+    return rv
+  end end,
   factory     = function(this, it)
     for k,_ in pairs(tables) do this.mm[k]=this.mm[k] or {} end
-    this.mm:mtremove()
+    this.mm:mtremoved()
     this.mm.__newindex=this.mm.__newindex or function(self, key, value)
         local f = (mt(self).__imports or {})[key]
         if is.callable(f) then
-          no.save(self, key, no.call(f, value)) else
-          no.save(self, key, value)
+          table.save(self, key, pcall(f, value)) else
+          table.save(self, key, value)
         end
       end
-    this.mm.__index=this.mm.__index or no.object
-    local created = mt(this.tt:mtremove(it, false), this.mm)
+    this.mm.__index=this.mm.__index or _object
+    local created = mt(this.tt:mtremoved(it, false), this.mm)
     if cache.loader[created] then
       cache.loader[getmetatable(created)]=cache.loader[created]
     end

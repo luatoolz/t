@@ -19,7 +19,7 @@ local complex={
 
 local function exporter(x, fix, skip)
   local tofix=fix or false
-  if is.imaginary(x) then x=tostring(x) end
+  if is.virtual(x) then x=tostring(x) end
   if is.atom(x) then return x end
   local mt = getmetatable(x or {}) or {}
   local to = mt.__export
