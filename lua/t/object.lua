@@ -54,13 +54,14 @@ local function uniq_split(it)
   if type(next(rv))~='nil' then return setmetatable(rv, nil) end
 end
 
-local tables=table{'__computed', '__computable', '__imports', '__required', '__id', '__default', '__filter', '__action'}:hashed()
+local tables=table{'__compute', '__computed', '__computable', '__imports', '__required', '__id', '__default', '__filter', '__action'}:hashed()
 
 return mt({}, {
   mt          = function(self, it) if it then update(self.mm, it)   end; return self end,  -- static (mt) vars/func/methods
   imports     = function(self, it) if it then self.__imports=it    end; return self end,  -- imports spec (typed object vars)
   computed    = function(self, it) if it then self.__computed=it   end; return self end,  -- computed vars (saved)
   computable  = function(self, it) if it then self.__computable=it end; return self end,  -- computable vars (unsaved)
+  compute     = function(self, it) if it then self.__compute=it    end; return self end,  -- compute vars (saved)
   default     = function(self, it) if it then self.__default=it    end; return self end,
   filter      = function(self, it) if it then self.__filter=it     end; return self end,
   action      = function(self, it) if it then self.__action=it     end; return self end,
@@ -71,7 +72,7 @@ return mt({}, {
   preindex    = function(self, f) if is.callable(f) then self.__preindex=f end;   return self end,  -- set __preindex function
   postindex   = function(self, f) if is.callable(f) then self.__postindex=f end;  return self end,  -- set __postindex function
   define      = function(self, it, name, path) if type(it)~='table' then return self end
-    self:required(it[true]):ids(it._):computed(mt(it).__computed):computable(mt(it).__computable)
+    self:required(it[true]):ids(it._):computed(mt(it).__computed):computable(mt(it).__computable):compute(mt(it).__compute)
       :filter(mt(it).__filter)
     if mt(it).__action then
       if type(mt(it).__action)=='function' then
