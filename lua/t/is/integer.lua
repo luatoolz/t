@@ -1,1 +1,3 @@
-return function(x) return type(x)=='number' and math.ceil(x)==x end
+local t=t or require "t"
+local to=t.number.integer
+return function(x) return to(x) and true end
