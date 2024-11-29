@@ -101,10 +101,10 @@ return mt({}, {
       elseif type(v)=='number' then
         if v==0 then rv[k]=to.number
         elseif is.integer(v) then
-          rv[k]=t.number.integer
+          rv[k]=to.integer
           self:default({[k]=v})
         else
-          rv[k]=to.number
+          rv[k]=t.number
           self:default({[k]=v})
         end
       elseif is.callable(v) then rv[k]=v end end
