@@ -19,6 +19,9 @@ local complex={
 
 local function exporter(x, fix, skip)
   local tofix=fix or false
+  if type(x)=='function' then
+    return exporter(table.map(x), fix, skip)
+  end
   if is.virtual(x) then x=tostring(x) end
   if is.atom(x) then return x end
   local mt = getmetatable(x or {}) or {}

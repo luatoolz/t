@@ -1,15 +1,22 @@
-local t = t or require "t"
+local t=t or require "t"
 local meta = require "meta"
-local is, mt, export, iter = t.is, meta.mt.mt, t.exporter, table.iter
+local is, mt, export, iter, checker =
+  t.is, meta.mt.mt, t.exporter, table.iter, meta.checker
+
+local iterable=checker({['userdata']=true,['table']=true,['function']=true,},type)
+local mts = {
+  [getmetatable(table())]=true,
+}
 
 local array={}
-return setmetatable(array,{
+setmetatable(array,{
   of=table.of,
   flatten=function(self, o) return array(table.flattened((is.array(self) and o) and o or self)) end,
   __add=function(self, it)
     assert(is.similar(array, self))
     if is.bulk(it) then return self .. it end
-    it=mt(self).__item and mt(self).__item(it) or it
+    local item=mt(self).__item
+    if item and is.callable(item) then it=item(it) end
     if type(it)~='nil' then table.insert(self, it) end
     return self
   end,
@@ -17,37 +24,43 @@ return setmetatable(array,{
   __preserve=true,
   __call=function(self, ...)
     assert(is.similar(array, self))
-    assert(is.callable(mt(self).__item) or mt(self).__item==nil)
-    if select('#', ...)==0 then return setmetatable({}, getmetatable(self)) end
-    local it=select(1, ...)
-    if type(it)=='userdata' then it=export(it) end
-    if type(it)=='table' and (not getmetatable(it)) and type(next(it))=='nil' then return setmetatable(it, getmetatable(self)) end
-    if type(it)=='table' and #it>0 then
-      local mts = {
-        [getmetatable(table())]=true,
-        [getmetatable(array)]=true,
-      }
-      local gmt=getmetatable(it)
-      if ((not gmt) or mts[gmt]) and is.null(mt(self).__item) then return setmetatable(it, getmetatable(self)) end
+    local item=mt(self).__item
+    assert(type(item)=='nil' or is.callable(item))
+
+    local len = select('#', ...)
+    if len==0 then return setmetatable({}, getmetatable(self)) end
+    local it = select(1, ...)
+    if len==1 and iterable[it] then
+      local gmt
+      if type(it)=='userdata' and getmetatable(it) then
+        gmt=getmetatable(it)
+        if is.callable(gmt.__iter) then it=iter(it)
+        elseif is.callable(gmt.__export) then it=export(it) end
+      end
+      if type(it)=='function' then return self() .. it end
+      gmt=getmetatable(it)
+      if type(it)=='table' and ((not gmt) or mts[gmt]) and (is.empty(it) or is.null(mt(self).__item)) then
+        return setmetatable(it, getmetatable(self))
+      end
     end
     return self() .. {...}
   end,
   __concat=function(self, it)
     assert(is.similar(array, self))
-    if is.bulk(it) then for x in iter(it) do _=self+x end end
+    if is.bulk(it) then it=iter(it) end
+    if is.func(it) then for x in it do _=self+x end end
     return self
   end,
   __eq=function(a, b)
-    if not is.array(a) then a,b = b,a end
+    if not is.similar(array, a) then a,b = b,a end
     assert(is.similar(array, a))
---    assert(is.similar(a, b))
+    assert(type(b)=='table')
     if #a~=#b then return false end
     if #a==0 then return (type(next(a))=='nil' and type(next(b))=='nil') and true or false end
     for i=1,#a do if a[i]~=b[i] then return false end end
     return true
   end,
   __index=function(self, k)
-    assert(is.similar(array, self))
     if type(k)=='string' then return mt(self)[k] end
     return rawget(self, k)
   end,
@@ -68,3 +81,5 @@ return setmetatable(array,{
   __tostring=function(self) assert(is.similar(array, self)); return table.concat(self*tostring, "\n") end,
   __unm=function(self) assert(is.similar(array, self)); return #self>0 and table.remove(self) or nil end,
 })
+mts[getmetatable(array)]=true
+return array

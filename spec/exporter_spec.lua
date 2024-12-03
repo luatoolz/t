@@ -51,5 +51,7 @@ describe("exporter", function()
     assert.same({'a', __array=true}, add(add(array('a'))))
     assert.same({'a', 'b', 'c', 'd', __array=true}, add(add(array('a', 'b', 'c', 'd'))))
     assert.same({1,2,3,4,__array=true}, add(add(array(1,2,3,4))))
+
+    assert.same({1,2,3,4}, tex(table.range(1,4)))
   end)
 end)
