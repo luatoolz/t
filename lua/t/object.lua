@@ -76,7 +76,7 @@ return mt({}, {
       :filter(mt(it).__filter)
     if mt(it).__action then
       if type(mt(it).__action)=='function' then
-        local __action={__=mt(it).__action}
+        local __action={default=mt(it).__action}
         mt(it).__action=nil
         self:action(__action)
       end
