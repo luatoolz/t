@@ -22,7 +22,7 @@ return setmetatable({},{
   end,
   __concat=function(self, o)
     assert(is.ofset(self))
-    if is.bulk(o) then for it in iter(o) do _ = self + it end end
+    if is.bulk(o) then for it in iter(o) do local _ = self + it end end
     return self
   end,
   __eq=function(a, b)
@@ -67,7 +67,7 @@ return setmetatable({},{
   end,
   __sub=function(self, it)
     assert(is.ofset(self))
-    if is.bulk(it) then for o in iter(it) do _=self-o end; return self end
+    if is.bulk(it) then for o in iter(it) do local _=self-o end; return self end
     if it and is.callable(mt(self).__item) then it=mt(self).__item(it) end
     if it and self[it] then rawset(self, it, nil) end
     return self

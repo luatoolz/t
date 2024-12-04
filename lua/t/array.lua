@@ -48,7 +48,7 @@ setmetatable(array,{
   __concat=function(self, it)
     assert(is.similar(array, self))
     if is.bulk(it) then it=iter(it) end
-    if is.func(it) then for x in it do _=self+x end end
+    if is.func(it) then for x in it do local _=self+x end end
     return self
   end,
   __eq=function(a, b)
@@ -71,7 +71,7 @@ setmetatable(array,{
   __pairs=ipairs,
   __sub=function(self, it)
     assert(is.similar(array, self))
-    if is.bulk(it) then for x in iter(it) do _=self-x end end
+    if is.bulk(it) then for x in iter(it) do local _=self-x end end
     if it and type(it)=='number' then
       if it<1 or it>#self then it=nil end
       table.remove(self, it) end

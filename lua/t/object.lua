@@ -8,6 +8,7 @@ local clone = table.clone
 local pcall = meta.pcall
 local _object = mt.object
 local to = t.to
+local _
 
 cache.conf.defroot={}
 
