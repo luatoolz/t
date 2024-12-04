@@ -39,7 +39,7 @@ return setmetatable({},{
     return rv or rawget(self, it) or rawget(self, item(it))
   end,
   __iter=function(self)
-    local k
+    local k,_
     return function(...)
       k,_ = next(self, k)
       if k~=nil then
