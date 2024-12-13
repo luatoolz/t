@@ -1,9 +1,6 @@
-local t = t or require "t"
+local t=t or require "t"
 local noop = t.fn.noop
-
 local index={}
-
--- cached(id)
 local cached = {}
 return setmetatable(cached, {
   __newindex=function(self, it, v) rawset(self, index[self](it), v) end,
