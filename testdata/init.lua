@@ -1,3 +1,1 @@
-local t = t or require"t"
-local pkg = (...)
-return require("meta").loader(pkg)
+return require("meta").loader(...)
