@@ -13,7 +13,6 @@ setmetatable(array,{
   of=table.of,
   flatten=function(self, o) return array(table.flattened((is.array(self) and o) and o or self)) end,
   __add=function(self, it)
-    assert(is.similar(array, self))
     if is.bulk(it) then return self .. it end
     local item=mt(self).__item
     if item and is.callable(item) then it=item(it) end
@@ -46,7 +45,8 @@ setmetatable(array,{
     return self() .. {...}
   end,
   __concat=function(self, it)
-    assert(is.similar(array, self))
+    if not is.similar(array, self) and type(self)=='table' and not getmetatable(self) then
+      setmetatable(self, getmetatable(array)) end
     if is.bulk(it) then it=iter(it) end
     if is.func(it) then for x in it do local _=self+x end end
     return self
@@ -69,6 +69,7 @@ setmetatable(array,{
   __mul=table.map,
   __name='array',
   __pairs=ipairs,
+  __pow=function(self, x) return array:of(x) end,
   __sub=function(self, it)
     assert(is.similar(array, self))
     if is.bulk(it) then for x in iter(it) do local _=self-x end end

@@ -2,7 +2,8 @@ local t = t or require "t"
 local meta = require "meta"
 local is, mt, array, export, iter, noop = t.is, meta.mt.mt, t.array, t.exporter, table.iter, meta.fn.noop
 
-return setmetatable({},{
+local set = {}
+return setmetatable(set,{
   of=table.of,
   __array=true,
   __preserve=true,
@@ -10,6 +11,8 @@ return setmetatable({},{
     assert(is.ofset(self))
     if not it then return self end
     if is.bulk(it) then return self .. it end
+    local item=mt(self).__item or noop
+    if it then it=item(it) end
     if it and not self[it] then self[it]=it end
     return self
   end,
@@ -65,6 +68,7 @@ return setmetatable({},{
     if it and is.callable(mt(self).__item) then it=mt(self).__item(it) end
     if it and v and not self[it] then rawset(self, it, it) end
   end,
+  __pow=function(self, x) return set:of(x) end,
   __sub=function(self, it)
     assert(is.ofset(self))
     if is.bulk(it) then for o in iter(it) do local _=self-o end; return self end
@@ -72,6 +76,9 @@ return setmetatable({},{
     if it and self[it] then rawset(self, it, nil) end
     return self
   end,
-  __export=function(self, fix) local rv=array(self); table.sort(rv); return export(rv, fix) end,
+  __export=function(self, fix) local rv=array(self)
+    local it = rv[1]
+    if type(it)~='table' or (getmetatable(it) or {}).__le or (getmetatable(it) or {}).__lt then table.sort(rv) end
+    return export(rv, fix) end,
   __tostring=function(self) return table.concat(array(self)*tostring, "\n") end,
 })
