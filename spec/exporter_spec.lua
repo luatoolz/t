@@ -1,9 +1,10 @@
 describe("exporter", function()
-  local t, export, array, add, clear, tex
+  local t, export, array, add, clear, iter, tex
   setup(function()
     t = require "t"
     export = t.exporter
     array = t.array
+    iter = t.iter
     tex = export
     add = function(x) return export(x, true) end
     clear = function(x) return export(x, false) end
@@ -52,6 +53,6 @@ describe("exporter", function()
     assert.same({'a', 'b', 'c', 'd', __array=true}, add(add(array('a', 'b', 'c', 'd'))))
     assert.same({1,2,3,4,__array=true}, add(add(array(1,2,3,4))))
 
-    assert.same({1,2,3,4}, tex(table.range(1,4)))
+    assert.same({1,2,3,4}, tex(iter.range(1,4)))
   end)
 end)

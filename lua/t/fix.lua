@@ -1,6 +1,6 @@
 local t=t or require "t"
 local is, this = t.is, {}
-local call = t.pcall
+local call = t.call
 
 --[[
   object fields modifier
