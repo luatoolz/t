@@ -1,4 +1,4 @@
-local t=t or require "t"
+local t=require "t"
 local noop = t.fn.noop
 local index={}
 local cached = {}

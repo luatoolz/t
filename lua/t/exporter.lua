@@ -1,5 +1,6 @@
-local t=t or require "t"
-local is=t.is
+local meta  = require 'meta'
+local is    = meta.is
+local maxi  = require 'meta.table.maxi'
 
 local function find_complex(x)
   if type(x)~='table' then return false end
@@ -34,8 +35,8 @@ local function exporter(x, fix, skip)
     local rv={}
     local array
     if type(x)=='table' and not getmetatable(x) then
-      if x[1] or #x>0 or table.maxi(x)>0 then
-        for i=1,table.maxi(x) do
+      if x[1] or #x>0 or maxi(x)>0 then
+        for i=1,maxi(x) do
           local v=x[i]
           table.insert(rv, complex[tofix](v) and exporter(v, fix) or v)
         end

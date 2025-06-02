@@ -1,2 +1,2 @@
-local t=t or require "t"
+local t=require "t"
 return t.matcher.x32

@@ -1,2 +1,2 @@
-local t=t or require "t"
-return t.wrapper(t.matcher, string.matcher)
+local t=require "t"
+return t.matcher*string.matcher

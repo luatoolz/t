@@ -1,3 +1,3 @@
-local t = t or require "t"
-local to, date = t.to, t.date
-return function(x) return to.number(date(x)) end
+local number  = require 'meta.number'
+local date    = require 't.date'
+return function(x) return number(date(x)) end

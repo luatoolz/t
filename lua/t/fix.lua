@@ -1,4 +1,4 @@
-local t=t or require "t"
+local t=require "t"
 local is, this = t.is, {}
 local call = t.call
 

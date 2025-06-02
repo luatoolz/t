@@ -22,6 +22,7 @@ dependencies = {
   "meta",
   "date",
   "luassert",
+  "lrexlib-pcre2",
 }
 
 test_dependencies = {

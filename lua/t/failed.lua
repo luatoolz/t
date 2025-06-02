@@ -1,4 +1,4 @@
-local t=t or require "t"
+local t=require "t"
 local is=t.is
 local indexed=table.indexed
 return setmetatable({}, {

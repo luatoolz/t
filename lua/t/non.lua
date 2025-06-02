@@ -1,1 +1,0 @@
-return (t or require("t")).is.non

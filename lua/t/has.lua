@@ -1,1 +1,1 @@
-return (t or require("t")).is.has
+return require("t").is.has

@@ -1,4 +1,4 @@
-local t=t or require "t"
+local t=require "t"
 local pkg, is, super = ..., t.is, {}
 return setmetatable(super, {
 __call=function(self, x)
