@@ -1,0 +1,32 @@
+describe("is.rex", function()
+  local t, is, rex, mtname
+  setup(function()
+    t = require 't'
+    is = t.is
+    rex = is.rex
+    mtname = is.rex.mtname
+  end)
+  it("meta", function()
+    assert.callable(is)
+    assert.callable(is.rex)
+    assert.is_true(is(is,rex))
+    assert.callable(is,rex[false])
+    assert.callable(mtname)
+  end)
+  it("positive", function()
+    assert.is_true(is.rex.mtname('__call'))
+  end)
+  it("negative", function()
+    assert.is_nil(mtname({}))
+    assert.is_nil(mtname(string.lower))
+    assert.is_nil(mtname(1))
+    assert.is_nil(mtname(true))
+    assert.is_nil(mtname(false))
+    assert.is_nil(mtname('some'))
+    assert.is_nil(mtname(''))
+  end)
+  it("nil", function()
+    assert.is_nil(mtname())
+    assert.is_nil(mtname(nil))
+  end)
+end)

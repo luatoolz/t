@@ -8,6 +8,7 @@ return setmetatable({}, {
     return setmetatable({...}, getmetatable(self)) end,
   __concat=function(self, it) if indexed(it) then
     for i=1,#it do local _ = self+it[i] end end; return self end,
+  __name='failed',
   __mul=function(self, it) if is.callable(it) then it(table.unpack(self)) end; return self end,
   __pow=function(self, it) return self end,
   __toboolean=function(self) return false end,

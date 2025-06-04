@@ -3,7 +3,7 @@ describe("match.x32", function()
 	setup(function()
     t = require 't'
     is = t.is
-    x32 = t.match.x32
+    x32 = t.pat.x32
 	end)
   it("meta", function()
     assert.truthy(is)
