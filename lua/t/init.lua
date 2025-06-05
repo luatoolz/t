@@ -1,13 +1,9 @@
-local meta    = require 'meta'
-local call    = meta.call
-local loader  = meta.loader
-local t       = loader('t') ^ true
+local t = require('meta').loader('t') ^ true
 
 if type(package.loaded.t)~='table' then
   if type(package.loaded.luassert)=='table' then
-    call(t.assert)
+    _=t+'assert'
   end
-  call(t.init)
 end
 
 return t
