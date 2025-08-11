@@ -1,5 +1,7 @@
-local meta  = require 'meta'
-local is    = meta.is
+local t     = require 't'
+local is    = t.is
+local iter  = t.iter
+local table = require 'meta.table'
 local maxi  = require 'meta.table.maxi'
 
 local function find_complex(x)
@@ -23,7 +25,6 @@ local function exporter(x, fix, skip)
   if type(x)=='function' then
     return exporter(table.map(x), fix, skip)
   end
-  if is.virtual(x) then x=tostring(x) end
   if is.atom(x) then return x end
   local mt = getmetatable(x or {}) or {}
   local to = mt.__export
@@ -57,7 +58,7 @@ local function exporter(x, fix, skip)
           rv[k]=exporter(v, fix)
         end
       elseif mt.__iter then
-        for v in table.iter(x) do
+        for v in iter(x) do
           table.insert(rv, complex[tofix](v) and exporter(v, fix) or v)
         end
         array=true

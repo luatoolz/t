@@ -6,4 +6,8 @@ if type(package.loaded.t)~='table' then
   end
 end
 
+if ngx and ngx.get_phase then
+  if ngx.get_phase()=='init' then _=t+'init' end
+end
+
 return t
